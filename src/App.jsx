@@ -20,7 +20,7 @@ function App() {
       <header className="header glass-header">
         <div className="header-inner">
           <div className="header-logo">
-            <img src="/logo/tohk.webp" alt="TOH Logo" className="toh-logo" />
+            <img src="/tohk.webp" alt="TOH Logo" className="toh-logo" />
           </div>
           <button className="btn-register">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -35,7 +35,7 @@ function App() {
       {/* Hero Section */}
       <section className="hero">
         <video className="hero-video" autoPlay muted loop playsInline>
-          <source src="/assets_video/hero.mp4" type="video/mp4" />
+          <source src="/hero.mp4" type="video/mp4" />
         </video>
         <div className="hero-overlay" />
         <div className="hero-content">
