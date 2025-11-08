@@ -927,7 +927,7 @@ function App() {
             <div className="footer-column">
               <div className="footer-logo">
                 <div className="logo-icon">
-                  <img src="/logo/tohk.webp" alt="TOH Logo" className="toh-logo" />
+                  <img src="/tohk.webp" alt="TOH Logo" className="toh-logo" />
                   <span className="logo-text"></span>
                 </div>
               </div>
