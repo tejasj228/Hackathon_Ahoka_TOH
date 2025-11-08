@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 
 function App() {
   const [expandedFAQ, setExpandedFAQ] = useState(null)
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [showFloatingButton, setShowFloatingButton] = useState(false)
 
   const toggleFAQ = (index) => {
     setExpandedFAQ(expandedFAQ === index ? null : index)
@@ -14,38 +16,59 @@ function App() {
       element.scrollIntoView({ behavior: 'smooth' })
     }
   }
+
+  // Auto-slide functionality
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prevSlide) => (prevSlide + 1) % 3) // 3 images total
+    }, 5000) // Change slide every 5 seconds
+
+    return () => clearInterval(interval)
+  }, [currentSlide])
+
+  // Scroll detection for floating button
+  useEffect(() => {
+    const handleScroll = () => {
+      const heroHeight = window.innerHeight
+      const scrollY = window.scrollY
+      setShowFloatingButton(scrollY > heroHeight * 0.8)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
   return (
     <div className="app">
-      {/* Header */}
-      <header className="header glass-header">
-        <div className="header-inner">
-          <div className="header-logo">
-            <img src="/tohk.webp" alt="TOH Logo" className="toh-logo" />
-          </div>
-          <button className="btn-register">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-              <polyline points="22 4 12 14.01 9 11.01"/>
-            </svg>
-            Apply Now
-          </button>
-        </div>
-      </header>
-
       {/* Hero Section */}
       <section className="hero">
-        <video className="hero-video" autoPlay muted loop playsInline>
-          <source src="/hero.mp4" type="video/mp4" />
-        </video>
+        <div className="hero-slider">
+          <div className={`hero-slide ${currentSlide === 0 ? 'active' : ''}`}>
+            <img src="https://images.unsplash.com/photo-1559136555-9303baea8ebd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Rural technology innovation" />
+          </div>
+          <div className={`hero-slide ${currentSlide === 1 ? 'active' : ''}`}>
+            <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Coding hackathon teamwork" />
+          </div>
+          <div className={`hero-slide ${currentSlide === 2 ? 'active' : ''}`}>
+            <img src="https://images.unsplash.com/photo-1497486751825-1233686d5d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80" alt="Innovation and development" />
+          </div>
+        </div>
         <div className="hero-overlay" />
+        <div className="slide-indicators">
+          <div className={`indicator ${currentSlide === 0 ? 'active' : ''}`} onClick={() => setCurrentSlide(0)}></div>
+          <div className={`indicator ${currentSlide === 1 ? 'active' : ''}`} onClick={() => setCurrentSlide(1)}></div>
+          <div className={`indicator ${currentSlide === 2 ? 'active' : ''}`} onClick={() => setCurrentSlide(2)}></div>
+        </div>
         <div className="hero-content">
           {/* Translucent card with ALL content inside */}
           <div className="translucent-card">
-            <div className="badge">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-              </svg>
-              Youth Innovation Hackathon
+            <div className="logo-card">
+              <div className="logo-container">
+                <img src="/tohk.webp" alt="TOH Logo" className="toh-logo-card" />
+                <div className="ashoka-logo-placeholder">
+                  <span>ASHOKA</span>
+                  <span className="ashoka-subtitle">UNIVERSITY</span>
+                </div>
+              </div>
             </div>
             <h1 className="hero-title">
               <span className="gradient-text">Build for Rural India</span><br />
@@ -67,6 +90,13 @@ function App() {
                   <circle cx="12" cy="10" r="3"/>
                 </svg>
                 IIT Delhi campus
+              </span>
+              <span className="meta-item deadline-meta">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                Apply by 25 Nov 2025, 11:59 PM
               </span>
             </div>
             <div className="hero-actions">
@@ -101,127 +131,107 @@ function App() {
               <p>
                 <strong>Square Hacks</strong> is a national hackathon that challenges college students to use the power of AI to reimagine rural India. It's not just about coding, it's about purpose-driven creation, a space to design, prototype, and pitch bold ideas that make technology work for everyone. From digital agriculture to last-mile education, students are free to explore challenges that matter most, building solutions that bridge the gap between India's roots and its rapidly evolving AI era.
               </p>
-            </div>
-          </div>
-
-          <div className="about-cards">
-            {/* Eligibility Card */}
-            <div className="info-card eligibility-card">
-              <div className="card-icon-wrapper">
-                <svg className="card-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                  <circle cx="9" cy="7" r="4"/>
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                </svg>
-              </div>
-              <h3 className="card-title">Eligibility</h3>
-              <div className="card-content">
-                <div className="info-item">
-                  <div className="info-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              
+              <div className="eligibility-highlight">
+                <div className="eligibility-header">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+                  <h4>Who Can Apply?</h4>
+                </div>
+                <div className="eligibility-content">
+                  <div className="eligibility-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
                       <path d="M6 12v5c3 3 9 3 12 0v-5"/>
                     </svg>
+                    <span>College students from any discipline across India</span>
                   </div>
-                  <span>College students from any discipline across India</span>
-                </div>
-                <div className="info-item">
-                  <div className="info-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <div className="eligibility-item">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
                       <line x1="16" y1="2" x2="16" y2="6"/>
                       <line x1="8" y1="2" x2="8" y2="6"/>
                       <line x1="3" y1="10" x2="21" y2="10"/>
                     </svg>
+                    <span>Age: 18–22 years</span>
                   </div>
-                  <span>Age: 18–22 years</span>
                 </div>
               </div>
-            </div>
 
-            {/* Deadline Card */}
-            <div className="info-card deadline-card">
-              <div className="card-icon-wrapper">
-                <svg className="card-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <polyline points="12 6 12 12 16 14"/>
-                </svg>
-              </div>
-              <h3 className="card-title">Last Date to Apply</h3>
-              <div className="card-content deadline-content">
-                <div className="date-display">
-                  <div className="date-left">
-                    <div className="date-number">25</div>
-                    <div className="date-details">
-                      <div className="date-month">November</div>
-                      <div className="date-year">2025</div>
+              {/* How It Works Section */}
+              <div className="how-it-works-integrated">
+                <h4 className="how-it-works-title">How It Works</h4>
+                <div className="flow-steps-integrated">
+                  <div className="flow-step-integrated">
+                    <div className="step-content">
+                      <div className="step-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                          <polyline points="14 2 14 8 20 8"/>
+                          <line x1="16" y1="13" x2="8" y2="13"/>
+                          <line x1="16" y1="17" x2="8" y2="17"/>
+                          <polyline points="10 9 9 9 8 9"/>
+                        </svg>
+                      </div>
+                      <div className="step-text">
+                        <h5>Apply</h5>
+                        <p>Submit your application</p>
+                      </div>
                     </div>
                   </div>
-                  <div className="time-display">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="12" cy="12" r="10"/>
-                      <polyline points="12 6 12 12 16 14"/>
-                    </svg>
-                    <span>11:59 PM (IST)</span>
+                  <div className="flow-step-integrated">
+                    <div className="step-content">
+                      <div className="step-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M9 11l3 3L22 4"/>
+                          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                        </svg>
+                      </div>
+                      <div className="step-text">
+                        <h5>Get Selected</h5>
+                        <p>Receive confirmation</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flow-step-integrated">
+                    <div className="step-content">
+                      <div className="step-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <polyline points="16 18 22 12 16 6"/>
+                          <polyline points="8 6 2 12 8 18"/>
+                        </svg>
+                      </div>
+                      <div className="step-text">
+                        <h5>Build</h5>
+                        <p>Create your solution</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flow-step-integrated">
+                    <div className="step-content">
+                      <div className="step-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                      </div>
+                      <div className="step-text">
+                        <h5>Win</h5>
+                        <p>Claim prizes & recognition</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Visual Flow Chart */}
-          <div className="hackathon-flow">
-            <h3 className="flow-title">How It Works</h3>
-            <div className="flow-steps">
-              <div className="flow-step">
-                <div className="step-number">1</div>
-                <div className="step-icon">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14 2 14 8 20 8"/>
-                    <line x1="16" y1="13" x2="8" y2="13"/>
-                    <line x1="16" y1="17" x2="8" y2="17"/>
-                    <polyline points="10 9 9 9 8 9"/>
-                  </svg>
-                </div>
-                <h4>Apply</h4>
-                <p>Submit your application</p>
-              </div>
-              <div className="flow-step">
-                <div className="step-number">2</div>
-                <div className="step-icon">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M9 11l3 3L22 4"/>
-                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-                  </svg>
-                </div>
-                <h4>Get Selected</h4>
-                <p>Receive confirmation</p>
-              </div>
-              <div className="flow-step">
-                <div className="step-number">3</div>
-                <div className="step-icon">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polyline points="16 18 22 12 16 6"/>
-                    <polyline points="8 6 2 12 8 18"/>
-                  </svg>
-                </div>
-                <h4>Build</h4>
-                <p>Create your solution</p>
-              </div>
-              <div className="flow-step">
-                <div className="step-number">4</div>
-                <div className="step-icon">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                  </svg>
-                </div>
-                <h4>Win</h4>
-                <p>Claim prizes & recognition</p>
-              </div>
-            </div>
-          </div>
+
+
+
         </div>
       </section>
 
@@ -330,7 +340,7 @@ function App() {
             {/* Theme 1 - AgriTech & Water */}
             <div className="theme-card">
               <div className="theme-icon-bg">
-                <svg className="theme-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg className="theme-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
                 </svg>
               </div>
@@ -343,7 +353,7 @@ function App() {
             {/* Theme 2 - Rural Health */}
             <div className="theme-card">
               <div className="theme-icon-bg">
-                <svg className="theme-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg className="theme-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
                 </svg>
               </div>
@@ -356,7 +366,7 @@ function App() {
             {/* Theme 3 - Education & Skills */}
             <div className="theme-card">
               <div className="theme-icon-bg">
-                <svg className="theme-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg className="theme-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
                   <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
                 </svg>
@@ -370,7 +380,7 @@ function App() {
             {/* Theme 4 - Livelihoods & Inclusion */}
             <div className="theme-card">
               <div className="theme-icon-bg">
-                <svg className="theme-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg className="theme-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="9" cy="7" r="4"/>
                   <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
                   <path d="M16 11l2 2 4-4"/>
@@ -385,7 +395,7 @@ function App() {
             {/* Theme 5 - Sustainability */}
             <div className="theme-card">
               <div className="theme-icon-bg">
-                <svg className="theme-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg className="theme-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M21.54 15H17a2 2 0 0 0-2 2v4.54"/>
                   <path d="M7 3.34V5a3 3 0 0 0 3 3v0a2 2 0 0 1 2 2v0c0 1.1.9 2 2 2v0a2 2 0 0 0 2-2v0c0-1.1.9-2 2-2h3.17"/>
                   <path d="M11 21.95V18a2 2 0 0 0-2-2v0a2 2 0 0 1-2-2v-1a2 2 0 0 0-2-2H2.05"/>
@@ -410,57 +420,119 @@ function App() {
             </h2>
           </div>
 
-          <div className="process-flowchart">
-            {/* Round 1 - Left */}
-            <div className="process-step left">
-              <div className="step-content">
-                <div className="step-badge">Round 1</div>
-                <h3 className="step-title">Online Idea Submission</h3>
-                <p className="step-date">Upto 25th Nov 2025</p>
-                <ul className="step-details">
-                  <li>Teams submit their innovative AI-driven ideas addressing rural challenges.</li>
-                  <li>Submissions are reviewed based on creativity, feasibility, and impact.</li>
-                </ul>
-              </div>
+          <div className="timeline-container">
+            {/* Timeline Line */}
+            <div className="timeline-line">
+              <div className="timeline-progress"></div>
             </div>
 
-            {/* Round 2 - Right */}
-            <div className="process-step right">
-              <div className="step-content">
-                <div className="step-badge">Round 2</div>
-                <h3 className="step-title">Online Design Sprint</h3>
-                <p className="step-date">1st Dec 2025</p>
-                <ul className="step-details">
-                  <li>Shortlisted teams submit a presentation deck detailing their proposed solution.</li>
-                  <li>Final presentations submitted within a 24-hour window.</li>
-                </ul>
+            {/* Timeline Steps */}
+            <div className="timeline-steps">
+              
+              {/* Step 1 */}
+              <div className="timeline-step">
+                <div className="step-node">
+                  <div className="node-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                      <polyline points="14 2 14 8 20 8"/>
+                      <line x1="16" y1="13" x2="8" y2="13"/>
+                      <line x1="16" y1="17" x2="8" y2="17"/>
+                    </svg>
+                  </div>
+                </div>
+                <div className="step-header">
+                  <h4 className="step-main-title">Applications Open</h4>
+                  <p className="step-subtitle">October 2025</p>
+                </div>
+                <div className="step-card">
+                  <div className="step-round">Round 1</div>
+                  <div className="step-number">1</div>
+                  <p className="step-description">
+                    Participants submit their applications.
+                  </p>
+                  <div className="step-number">2</div>
+                  <p className="step-description">
+                    Mentorship opportunities on scaling strategies, GTM etc.
+                  </p>
+                </div>
               </div>
-            </div>
 
-            {/* Round 3 - Left */}
-            <div className="process-step left">
-              <div className="step-content">
-                <div className="step-badge">Round 3</div>
-                <h3 className="step-title">On-Ground Hackathon, IIT Delhi campus</h3>
-                <p className="step-date">26th-28th Dec 2025</p>
-                <ul className="step-details">
-                  <li>Selected teams prototype and develop their solutions over a 24-hours hack.</li>
-                  <li>Mentors guide participants through technical and design challenges.</li>
-                </ul>
+              {/* Step 2 */}
+              <div className="timeline-step">
+                <div className="step-node">
+                  <div className="node-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M9 11l3 3L22 4"/>
+                      <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                    </svg>
+                  </div>
+                </div>
+                <div className="step-header">
+                  <h4 className="step-main-title">Evaluations & Virtual</h4>
+                  <p className="step-subtitle">Bootcamps</p>
+                </div>
+                <div className="step-card">
+                  <div className="step-round">Round 2</div>
+                  <div className="step-number">1</div>
+                  <p className="step-description">
+                    Shortlisted participants to get access to bootcamps to strengthen pitching skills.
+                  </p>
+                  <div className="step-number">2</div>
+                  <p className="step-description">
+                    <strong>Top 20 finalists</strong> will be selected
+                  </p>
+                </div>
               </div>
-            </div>
 
-            {/* Round 4 - Right */}
-            <div className="process-step right">
-              <div className="step-content">
-                <div className="step-badge">Round 4</div>
-                <h3 className="step-title">Final Pitching & Showcase</h3>
-                <p className="step-date">28th Dec 2025</p>
-                <ul className="step-details">
-                  <li>Teams pitch their solutions to a jury of experts and industry leaders.</li>
-                  <li>Winning teams announced and awarded for innovation and impact.</li>
-                </ul>
+              {/* Step 3 */}
+              <div className="timeline-step">
+                <div className="step-node">
+                  <div className="node-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                    </svg>
+                  </div>
+                </div>
+                <div className="step-header">
+                  <h4 className="step-main-title">Grand Showcase and</h4>
+                  <p className="step-subtitle">Winner Announcement</p>
+                </div>
+                <div className="step-card">
+                  <div className="step-round">Round 3</div>
+                  <div className="step-number">1</div>
+                  <p className="step-description">
+                    The journey culminates in the <strong>India AI Impact Summit</strong>, where the <strong>Top 20 teams</strong> will showcase their solutions to an audience of experts, investors, and thought leaders and <strong>top 10 winners will be felicitated.</strong>
+                  </p>
+                </div>
               </div>
+
+              {/* Step 4 */}
+              <div className="timeline-step">
+                <div className="step-node">
+                  <div className="node-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                  </div>
+                </div>
+                <div className="step-header">
+                  <h4 className="step-main-title">Final Pitching &</h4>
+                  <p className="step-subtitle">Showcase</p>
+                </div>
+                <div className="step-card">
+                  <div className="step-round">Round 4</div>
+                  <div className="step-number">1</div>
+                  <p className="step-description">
+                    Teams pitch their solutions to a jury of experts and industry leaders.
+                  </p>
+                  <div className="step-number">2</div>
+                  <p className="step-description">
+                    Winning teams announced and awarded for innovation and impact.
+                  </p>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -620,15 +692,14 @@ function App() {
       {/* Logistics Support Section */}
       <section id="logistics" className="logistics-section">
         <div className="logistics-container">
-          <div className="logistics-grid">
-            <div className="logistics-header">
-              <h2 className="logistics-title">
-                Logistics <span className="gradient-text-logistics">Support</span>
-              </h2>
-              <p className="logistics-subtitle">
-                We want you to focus on what matters most: building impactful solutions. Leave the rest to us!
-              </p>
-            </div>
+          <div className="logistics-header">
+            <h2 className="logistics-title">
+              Logistics <span className="gradient-text-logistics">Support</span>
+            </h2>
+            <p className="logistics-subtitle">
+              We want you to focus on what matters most: building impactful solutions. Leave the rest to us!
+            </p>
+          </div>
 
             <div className="logistics-cards-wrapper">
               {/* Travel */}
@@ -695,7 +766,6 @@ function App() {
                 </p>
               </div>
             </div>
-          </div>
         </div>
       </section>
 
@@ -709,91 +779,61 @@ function App() {
 
           </div>
 
-          <div className="evaluation-timeline">
-            {/* Design - Top */}
-            <div className="evaluation-item top">
-              <div className="evaluation-card">
-                <div className="evaluation-icon">
-                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M12 19l7-7 3 3-7 7-3-3z"/>
-                    <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
-                    <path d="M2 2l7.586 7.586"/>
-                    <circle cx="11" cy="11" r="2"/>
-                  </svg>
-                </div>
-                <h3 className="evaluation-card-title">Design</h3>
-                <p className="evaluation-card-description">
-                  User interface, experience design, and visual appeal of the solution
-                </p>
+          <div className="evaluation-cards-wrapper">
+            {/* Design */}
+            <div className="evaluation-card">
+              <div className="evaluation-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 19l7-7 3 3-7 7-3-3z"/>
+                  <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
+                  <path d="M2 2l7.586 7.586"/>
+                  <circle cx="11" cy="11" r="2"/>
+                </svg>
               </div>
-              <div className="evaluation-connector"></div>
+              <h3 className="evaluation-card-title">Design</h3>
             </div>
 
-            {/* Originality - Bottom */}
-            <div className="evaluation-item bottom">
-              <div className="evaluation-connector"></div>
-              <div className="evaluation-card">
-                <div className="evaluation-icon">
-                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="3"/>
-                    <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"/>
-                  </svg>
-                </div>
-                <h3 className="evaluation-card-title">Originality</h3>
-                <p className="evaluation-card-description">
-                  Innovation, creativity, and uniqueness of the proposed solution
-                </p>
+            {/* Originality */}
+            <div className="evaluation-card">
+              <div className="evaluation-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"/>
+                </svg>
               </div>
+              <h3 className="evaluation-card-title">Originality</h3>
             </div>
 
-            {/* Technical Depth - Top */}
-            <div className="evaluation-item top">
-              <div className="evaluation-card">
-                <div className="evaluation-icon">
-                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polyline points="16 18 22 12 16 6"/>
-                    <polyline points="8 6 2 12 8 18"/>
-                  </svg>
-                </div>
-                <h3 className="evaluation-card-title">Technical Depth</h3>
-                <p className="evaluation-card-description">
-                  Complexity of implementation, code quality, and technical expertise
-                </p>
+            {/* Technical Depth */}
+            <div className="evaluation-card">
+              <div className="evaluation-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="16 18 22 12 16 6"/>
+                  <polyline points="8 6 2 12 8 18"/>
+                </svg>
               </div>
-              <div className="evaluation-connector"></div>
+              <h3 className="evaluation-card-title">Technical Depth</h3>
             </div>
 
-            {/* Usability - Bottom */}
-            <div className="evaluation-item bottom">
-              <div className="evaluation-connector"></div>
-              <div className="evaluation-card">
-                <div className="evaluation-icon">
-                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                    <circle cx="12" cy="7" r="4"/>
-                  </svg>
-                </div>
-                <h3 className="evaluation-card-title">Usability</h3>
-                <p className="evaluation-card-description">
-                  Ease of use, accessibility, and user-friendliness of the solution
-                </p>
+            {/* Usability */}
+            <div className="evaluation-card">
+              <div className="evaluation-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
               </div>
+              <h3 className="evaluation-card-title">Usability</h3>
             </div>
 
-            {/* Impact - Top */}
-            <div className="evaluation-item top">
-              <div className="evaluation-card">
-                <div className="evaluation-icon">
-                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-                  </svg>
-                </div>
-                <h3 className="evaluation-card-title">Impact</h3>
-                <p className="evaluation-card-description">
-                  Potential to solve rural challenges and create meaningful change
-                </p>
+            {/* Impact */}
+            <div className="evaluation-card">
+              <div className="evaluation-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                </svg>
               </div>
-              <div className="evaluation-connector"></div>
+              <h3 className="evaluation-card-title">Impact</h3>
             </div>
           </div>
         </div>
@@ -959,6 +999,18 @@ function App() {
           </div>
         </div>
       </footer>
+
+      {/* Floating Apply Now Button */}
+      <button 
+        className={`floating-apply-btn ${showFloatingButton ? 'visible' : ''}`}
+        onClick={() => window.open('#', '_blank')}
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        Apply Now
+      </button>
     </div>
   )
 }
